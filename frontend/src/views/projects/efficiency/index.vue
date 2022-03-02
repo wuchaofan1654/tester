@@ -1,151 +1,143 @@
 <template>
-  <div class="app-container">
-    <el-row :gutter="20">
-      <!--部门数据-->
-      <el-col :span="4" :xs="24">
-        <div class="head-container">
+  <el-container style="height: 700px; padding: 20px 20px 20px 20px">
+    <!--部门数据-->
+    <div class="head-container" style="width: 25%; margin-right: 20px">
+      <div style="margin: 10px 10px 10px 10px">
+        <el-input
+          v-model="moduleName"
+          placeholder="请输入模块名称"
+          clearable
+          size="small"
+          prefix-icon="el-icon-search"/>
+      </div>
+      <el-tree
+        ref="tree"
+        :data="moduleOptions"
+        :props="moduleProps"
+        :expand-on-click-node="false"
+        :filter-node-method="filterNode"
+        default-expand-all
+        @node-click="handleNodeClick">
+      </el-tree>
+    </div>
+    <div style="width: 75%">
+      <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
+        <el-form-item label="名称" prop="moduleName">
           <el-input
-            v-model="moduleName"
-            placeholder="请输入模块名称"
+            v-model="queryParams.moduleName"
+            placeholder="请输入小工具名称"
             clearable
             size="small"
-            prefix-icon="el-icon-search"
-            style="margin-bottom: 20px"
+            style="width: 240px"
+            @keyup.enter.native="handleQuery"
           />
-        </div>
-        <div class="head-container">
-          <el-tree
-            ref="tree"
-            :data="moduleOptions"
-            :props="moduleProps"
-            :expand-on-click-node="false"
-            :filter-node-method="filterNode"
-            default-expand-all
-            @node-click="handleNodeClick"
+        </el-form-item>
+        <el-form-item label="状态" prop="is_active">
+          <el-select
+            v-model="queryParams.is_active"
+            placeholder="请选择状态"
+            clearable
+            size="small"
+            style="width: 240px"
           >
-          </el-tree>
-        </div>
-      </el-col>
-      <!--用户数据-->
-      <el-col :span="20" :xs="24">
-        <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-          <el-form-item label="名称" prop="moduleName">
-            <el-input
-              v-model="queryParams.moduleName"
-              placeholder="请输入小工具名称"
-              clearable
-              size="small"
-              style="width: 240px"
-              @keyup.enter.native="handleQuery"
+            <el-option
+              v-for="dict in statusOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
             />
-          </el-form-item>
-          <el-form-item label="状态" prop="is_active">
-            <el-select
-              v-model="queryParams.is_active"
-              placeholder="请选择状态"
-              clearable
-              size="small"
-              style="width: 240px"
-            >
-              <el-option
-                v-for="dict in statusOptions"
-                :key="dict.dictValue"
-                :label="dict.dictLabel"
-                :value="dict.dictValue"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item v-if="false" label="创建时间">
-            <el-date-picker
-              v-model="dateRange"
-              size="small"
-              style="width: 240px"
-              value-format="yyyy-MM-dd"
-              type="daterange"
-              range-separator="-"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          </el-form-item>
-        </el-form>
-        <el-table v-loading="loading" :data="efficiencyList" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="50" align="center" />
-          <el-table-column key="id" label="编号" align="center" prop="id" />
-          <el-table-column
-            key="name"
-            label="名称"
-            align="center"
-            prop="name"
-            :show-overflow-tooltip="true"
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="false" label="创建时间">
+          <el-date-picker
+            v-model="dateRange"
+            size="small"
+            style="width: 240px"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
           />
-          <el-table-column
-            key="command"
-            label="脚本"
-            align="center"
-            prop="command"
-            :show-overflow-tooltip="true"
-          />
-          <el-table-column key="is_active" label="状态" align="center">
-            <template slot-scope="scope">
-              <el-switch
-                v-model="scope.row.status"
-                disabled
-                @change="handleStatusChange(scope.row)"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column label="创建时间" align="center" prop="create_datetime" width="160">
-            <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.create_datetime) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            v-if="hasPermi(['permission:user:{id}:put','permission:user:{id}:delete','permission:user:resetpwd:put'])"
-            label="操作"
-            align="center"
-            width="160"
-            class-name="small-padding fixed-width"
-          >
-            <template slot-scope="scope">
-              <el-button
-                v-hasPermi="['permission:user:{id}:put']"
-                size="mini"
-                type="text"
-                icon="el-icon-edit"
-                @click="handleUpdate(scope.row)"
-              >修改
-              </el-button>
-              <el-button
-                v-if="scope.row.id !== 1"
-                v-hasPermi="['permission:user:{id}:delete']"
-                size="mini"
-                type="text"
-                icon="el-icon-delete"
-                @click="handleDelete(scope.row)"
-              >删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <pagination
-          v-show="total>0"
-          :total="total"
-          :page.sync="queryParams.pageNum"
-          :limit.sync="queryParams.pageSize"
-          @pagination="getList"
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+      <el-table v-loading="loading" :data="efficiencyList" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="50" align="center"/>
+        <el-table-column key="id" label="编号" align="center" prop="id"/>
+        <el-table-column
+          key="name"
+          label="名称"
+          align="center"
+          prop="name"
+          :show-overflow-tooltip="true"
         />
-      </el-col>
-    </el-row>
-  </div>
+        <el-table-column
+          key="command"
+          label="脚本"
+          align="center"
+          prop="command"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column key="is_active" label="状态" align="center">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.status"
+              disabled
+              @change="handleStatusChange(scope.row)"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="创建时间" align="center" prop="create_datetime" width="160">
+          <template slot-scope="scope">
+            <span>{{ parseTime(scope.row.create_datetime) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-if="hasPermi(['permission:user:{id}:put','permission:user:{id}:delete','permission:user:resetpwd:put'])"
+          label="操作"
+          align="center"
+          width="160"
+          class-name="small-padding fixed-width"
+        >
+          <template slot-scope="scope">
+            <el-button
+              v-hasPermi="['permission:user:{id}:put']"
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUpdate(scope.row)"
+            >修改
+            </el-button>
+            <el-button
+              v-if="scope.row.id !== 1"
+              v-hasPermi="['permission:user:{id}:delete']"
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+            >删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
+    </div>
+  </el-container>
 </template>
 
 <script>
-import { listModule, listEfficiencyByParentId, listEfficiency } from "@/api/projects/efficiency";
+import {listModule, listEfficiencyByParentId, listEfficiency} from "@/api/projects/efficiency";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
@@ -180,7 +172,7 @@ export default {
       // 日期范围
       dateRange: [],
       // 状态数据字典
-      statusOptions: [{ dictLabel: "正常", dictValue: true }, { dictLabel: "停用", dictValue: false }],
+      statusOptions: [{dictLabel: "正常", dictValue: true}, {dictLabel: "停用", dictValue: false}],
       form: {},
       defaultProps: {
         children: "children",
@@ -218,10 +210,10 @@ export default {
     getList() {
       this.loading = true;
       listEfficiency(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-        this.efficiencyList = response.data.results;
-        this.total = response.data.count;
-        this.loading = false;
-      }
+          this.efficiencyList = response.data.results;
+          this.total = response.data.count;
+          this.loading = false;
+        }
       );
     },
 
@@ -268,3 +260,8 @@ export default {
   }
 };
 </script>
+<style slot="scoped">
+.head-container {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+}
+</style>

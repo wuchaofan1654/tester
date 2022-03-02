@@ -7,6 +7,7 @@ import permission from "./modules/permission";
 import settings from "./modules/settings";
 import modelSelect from "./modules/modelSelect";
 import getters from "./getters";
+import log from "@/views/basics/monitor/job/log";
 
 Vue.use(Vuex);
 

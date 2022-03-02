@@ -1,6 +1,7 @@
 <template>
   <el-cascader
     ref="rpcCas"
+    size="mini"
     :props="casProps"
     :options="options"
     @change="handleChange">

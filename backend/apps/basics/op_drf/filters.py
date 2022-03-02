@@ -6,7 +6,7 @@ import logging
 import operator
 from functools import reduce
 
-from django.utils import six
+import six
 from mongoengine.queryset import visitor
 from rest_framework.filters import BaseFilterBackend, SearchFilter, OrderingFilter
 

@@ -12,7 +12,6 @@ from django.dispatch import Signal
 
 @receiver(signal=post_init, sender=Point, dispatch_uid='point_pre_init_signal_11')
 def point_init_callback(sender, instance=None, created=False, **kwargs):
-    print(f"==========={sender}============")
     point_received_signal.send(sender=sender)
 
 
@@ -25,6 +24,10 @@ def point_save_callback(sender, instance=None, created=False, **kwargs):
 # self defined signals
 # mitmproxy 接收到埋点信息
 point_received_signal = Signal()
+# mitmproxy start
+mitmproxy_started_signal = Signal()
+# mitmproxy end
+mitmproxy_closed_signal = Signal()
 
 
 @receiver(point_received_signal)
@@ -33,7 +36,7 @@ def point_received_signal_callback_check(sender, **kwargs):
     @sender: 埋点信息
     检查埋点是否正确
     """
-    print(f'point_received_signal_callback_check: {sender}')
+    pass
 
 
 @receiver(point_received_signal)
@@ -41,7 +44,12 @@ def point_received_signal_callback_save(sender, **kwargs):
     """
     埋点信息入库
     """
-    print(f'point_received_signal_callback_save: {sender}')
+    pass
+
+
+@receiver(mitmproxy_started_signal)
+def mitmproxy_started_signal_callback(sender, **kwargs):
+    print(f'mitmproxy_started_signal_callback: {sender}, {kwargs}')
 
 
 

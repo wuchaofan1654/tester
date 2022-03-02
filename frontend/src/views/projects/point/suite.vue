@@ -1,5 +1,5 @@
 <template> 
-  <div class="app-container">
+  <div style="margin: 20px 10px 20px 10px">
     <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true">
       <el-form-item label="埋点集合名称" prop="name">
         <el-input

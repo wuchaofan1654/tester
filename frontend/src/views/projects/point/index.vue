@@ -1,5 +1,5 @@
 <template> 
-  <div class="app-container">
+  <div style="margin: 20px 10px 20px 10px">
     <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true">
       <el-form-item label="埋点名称" prop="name">
         <el-input
@@ -104,7 +104,7 @@
     <el-table v-loading="loading" :data="pointList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="埋点编号" prop="id" width="80" />
-      <el-table-column label="英文名称" prop="name" :show-overflow-tooltip="true" />
+      <el-table-column label="英文名称" prop="en_name" :show-overflow-tooltip="true" />
       <el-table-column label="埋点类型" prop="p_type" width="100" :show-overflow-tooltip="true" :formatter="pTypeFormat"/>
       <el-table-column label="是否核心" prop="key_yn" width="100" :formatter="keyYnFormat"/>
       <el-table-column label="页面扩展信息" prop="page_ext" width="100" />
@@ -240,6 +240,7 @@ export default {
   }
 }
 </script>
-<style></style>
+<style>
+</style>
 
 

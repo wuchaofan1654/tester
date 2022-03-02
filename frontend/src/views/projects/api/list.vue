@@ -1,5 +1,5 @@
 <template> 
-  <div class="app-container">
+  <el-card class="app-container">
     <el-form v-show="showSearch" ref="queryForm" :model="queryParams" :inline="true">
       <el-form-item label="接口名称" prop="name">
         <el-input
@@ -156,7 +156,7 @@
         </template>
       </el-table-column>
     </el-table>
-  </div>
+  </el-card>
 </template>
 <script>
 import {listApi} from '@/api/projects/api'
@@ -241,6 +241,7 @@ export default {
   }
 }
 </script>
-<style></style>
+<style>
+</style>
 
 

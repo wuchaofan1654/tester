@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'captcha',
+    'channels',
     'django_celery_beat',
     'drf_yasg',  # swagger 接口
     # 自定义app
@@ -54,8 +55,8 @@ INSTALLED_APPS = [
     'apps.basics.celery',
     'apps.basics.monitor',
     'apps.projects.api',
-    'apps.projects.case',
     'apps.projects.point',
+    'apps.projects.case',
     'apps.projects.efficiency'
 ]
 
@@ -95,6 +96,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'application.wsgi.application'
+ASGI_APPLICATION = 'application.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
@@ -221,6 +223,16 @@ LOGGING = {
     }
 }
 
+# channels channel_layers 使用 redis
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        }
+    },
+}
+
 # ================================================= #
 # ************** 数据库 配置  ************** #
 # ================================================= #
@@ -338,3 +350,7 @@ CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'  # Back
 INTERFACE_PERMISSION = locals().get("INTERFACE_PERMISSION", False)
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 CELERY_TIMEZONE = 'Asia/Shanghai'  # celery 时区问题
+
+TAIL_LOG_CONTENT = {
+    "E": "/logs/error.log"
+}

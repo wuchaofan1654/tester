@@ -3,6 +3,7 @@ import { getToken, removeToken, setToken } from "@/utils/auth";
 
 const user = {
   state: {
+    userId: 0,
     token: getToken(),
     name: "",
     avatar: "",
@@ -10,8 +11,10 @@ const user = {
     permissions: [],
     unread_msg_count: 0
   },
-
   mutations: {
+    SET_USER_ID: (state, userId) => {
+      state.userId = userId;
+    },
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
@@ -62,6 +65,7 @@ const user = {
           } else {
             commit("SET_ROLES", ["ROLE_DEFAULT"]);
           }
+          commit("SET_USER_ID", user.id);
           commit("SET_NAME", user.name);
           commit("SET_UNREAD_MSG_COUNT", user.unread_msg_count);
           commit("SET_AVATAR", avatar);
